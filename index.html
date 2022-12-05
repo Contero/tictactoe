@@ -169,13 +169,15 @@
 			
 			checkWinCondition(this);
 			
-			if (++count === 9) {
-				playing = false;
-				$("message").innerHTML = "Cats Game!";
+			if (playing) {
+				if (++count === 9) {
+					playing = false;
+					$("message").innerHTML = "Cats Game!";
+				}
+									
+				player = !player;
+				updatePlayerDisplay();
 			}
-			
-			player = !player;
-			updatePlayerDisplay();
 		}
 		
 		function checkWinCondition(elem) {
