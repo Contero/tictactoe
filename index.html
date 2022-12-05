@@ -1,0 +1,239 @@
+<head>
+	<title>Tic Tac Toe</title>
+	<style>
+		body {
+			font-family: arial;
+			margin: 0;
+			background-color: lightPink;
+			color: Indigo;
+		}
+
+		.cell {
+			display: inline-block;
+			height: min(20vh, 33vw);
+			width: min(20vh, 33vw);
+			box-sizing: border-box;
+			margin: -2px;
+			font-size: 15vh;
+			text-align: center;
+			vertical-align: top;
+		}
+		
+		main {
+			height: 60vh;
+		}
+		
+		.R1, .R2 {
+			border-bottom: 2px solid Indigo;
+		}
+		
+		.C1, .C2 {
+			border-right: 2px solid Indigo; 
+		}
+		
+		.R2, .R3 {
+			border-top: 2px solid Indigo;
+		}
+		
+		.C2, .C3 {
+			border-left: 2px solid Indigo; 
+		}
+		
+		.board {
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 60vh;
+			background-color: MistyRose;
+			box-shadow: 3px 3px 3px Indigo;
+		}
+		
+		.center , h1 {
+			text-align: center;
+		}
+		
+		h1 {
+			height: 10vh;
+			font-size: 8vh;
+			margin: 0;
+		}
+		
+		button {
+			height: 10vh;
+			width: 90%;
+			font-size: 5vh;
+			background-color: Indigo;
+			color: MistyRose;
+		}
+		
+		.turn {
+			height: 10vh;
+			font-size: 5vh;
+		}
+		
+		footer {
+			position:absolute;
+			bottom: 0;
+			width: 100%;
+			
+		}
+		
+		#message {
+			position: absolute;
+			font-size: 5vh;
+			bottom: 10vh;
+			width:100%;
+			text-align: center;
+			color: indigo;
+		}
+		
+	</style>
+</head>
+<body onload = "init()">
+	<header>
+		<h1>Tic Tac Toe</h1>
+		<div class="center turn">
+			<span id="currentPlayer"></span><span>'s turn</span>
+		</div>
+	</header>
+	<main class="center">
+		<div class="board">
+			<div class="row">
+				<div class="cell R1 C1" id="R1C1"></div>
+				<div class="cell R1 C2" id="R1C2"></div>
+				<div class="cell R1 C3" id="R1C3"></div>
+			</div>
+			<div class="row">
+				<div class="cell R2 C1" id="R2C1"></div>
+				<div class="cell R2 C2" id="R2C2"></div>
+				<div class="cell R2 C3" id="R2C3"></div>
+			</div>
+			<div class="row">
+				<div class="cell R3 C1" id="R3C1"></div>
+				<div class="cell R3 C2" id="R3C2"></div>
+				<div class="cell R3 C3" id="R3C3"></div>
+			</div>
+		</div>
+	</main>
+	<section id="message"></section>
+	<footer class="center">
+		<button id="newGame" onclick="newGame()">New Game</button>
+	</footer>
+
+
+	<script>
+		// using a bool to keep track of player since its binary and easy to flip: x= true, o = false;
+		let $ = (id) => document.getElementById(id);
+		let $$ = (clas) => document.getElementsByClassName(clas);
+		
+		let player;
+		let playing;
+		let count;
+		
+		function init() {
+			for (var cell of $$("cell")) {
+				cell.addEventListener("click", takeTurn);
+			}
+			newGame();
+		}
+		
+		let newGame = function() {
+			clearScreen();
+			player = true;
+			updatePlayerDisplay();
+			$("message").innerHTML = "";
+			playing = true;
+			count = 0;
+		};
+		
+		let clearScreen = () => {
+			let cells = $$("cell");
+			for (var cell of cells) {
+				cell.innerHTML = "";
+			}
+		};
+		
+		let currentPlayer = () => player ? "X" : "O";
+		
+		let updatePlayerDisplay = () => {
+			$("currentPlayer").innerHTML = currentPlayer();
+		};
+		
+		function takeTurn() {
+			clicked = this;
+			if (!playing || this.innerHTML !== "") {
+				return;
+			}
+			
+			this.innerHTML = currentPlayer();
+			
+			checkWinCondition(this);
+			
+			if (++count === 9) {
+				playing = false;
+				$("message").innerHTML = "Cats Game!";
+			}
+			
+			player = !player;
+			updatePlayerDisplay();
+		}
+		
+		function checkWinCondition(elem) {
+			let id = elem.id;
+			let row = id[1];
+			let col = id[3];
+			
+			let win = [];
+			for (let x = 1; x <= 3; x++) {
+				win.push($(`R${row}C${x}`).innerHTML);
+			}
+			
+			checkWin(win);
+			if (!playing) return;
+			
+			win = [];
+			for (let x = 1; x <= 3; x++) {
+				win.push($(`R${x}C${col}`).innerHTML);
+			}
+						
+			checkWin(win);
+			if (!playing) return;
+			
+			// diags
+			if (row == col || row == 1 && col == 3 || row == 3 && col == 1) {
+				win = [];
+				for (let x = 1; x <= 3; x++) {
+					let cell = $(`R${x}C${x}`)
+						if (!cell) {
+						break;
+					} else {
+						win.push(cell.innerHTML);
+					}
+				}
+				if (!win.every(x => x == "")) checkWin(win);
+				
+				if (!playing) return;
+				win = [];
+				cell = $("R1C3");
+				win.push(cell.innerHTML)
+				
+				cell = $("R2C2");
+				win.push(cell.innerHTML)
+				
+				cell = $("R3C1");
+				win.push(cell.innerHTML)
+				
+				if (!win.every(x => x == "")) checkWin(win);
+			}
+		}
+		
+		function checkWin(win) {
+			if (win[0] == win[1] && win[1] == win[2]) {
+				$("message").innerHTML = `${currentPlayer()} WINS`;
+				playing = false;
+			}
+		}
+		
+	</script>
+</body>	
+
